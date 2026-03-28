@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { getPublicClient } from '../buda';
+import { getPublicClient, getPrivateClient } from '../buda';
 
 function print(data: unknown) {
   console.log(JSON.stringify(data, null, 2));
@@ -52,6 +52,6 @@ export function registerPublicCommands(program: Command) {
     .description('Get quotation for a market (type: bid_given_earned_base, etc.)')
     .option('-l, --limit <limit>', 'Limit price')
     .action((market: string, type: string, amount: string, opts: { limit?: string }) => {
-      handle(getPublicClient().get_quotation(market, type, parseFloat(amount), opts.limit));
+      handle(getPrivateClient().get_quotation(market, type, parseFloat(amount), opts.limit));
     });
 }

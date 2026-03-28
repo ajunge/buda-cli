@@ -36,7 +36,6 @@ Credentials are saved to a `.env` file in your current directory.
 | `buda trades <market>` | Get recent trades for a market |
 | `buda volume <market>` | Get traded volume for a market |
 | `buda fees <currency> <type>` | Get fees (`type`: `deposit` or `withdrawal`) |
-| `buda quotation <market> <type> <amount>` | Get a price quotation |
 
 ### Private (requires API credentials)
 
@@ -46,6 +45,7 @@ Credentials are saved to a `.env` file in your current directory.
 | `buda orders <market>` | List orders for a market |
 | `buda order new <market> <type> <price-type> <limit> <amount>` | Create a new order |
 | `buda me` | Get current user information |
+| `buda quotation <market> <type> <amount>` | Get a price quotation |
 | `buda order cancel <id>` | Cancel an order |
 | `buda order cancel-all <market> <type>` | Cancel all orders for a market and type |
 | `buda order get <id>` | Get a single order |
