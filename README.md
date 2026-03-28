@@ -8,6 +8,12 @@ Command-line interface for the [buda.com](https://www.buda.com) cryptocurrency e
 npm install -g buda-cli
 ```
 
+Or use it without installing via npx:
+
+```sh
+npx buda-cli <command>
+```
+
 ## Setup
 
 Run `buda init` to configure your API credentials. You can create API keys at [buda.com/manejar_api_keys](https://www.buda.com/manejar_api_keys).
