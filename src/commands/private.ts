@@ -14,6 +14,11 @@ function handle(promise: Promise<unknown>) {
 
 export function registerPrivateCommands(program: Command) {
   program
+    .command('me')
+    .description('Get current user information')
+    .action(() => handle(getPrivateClient().me()));
+
+  program
     .command('balance [currency]')
     .description('Get account balance (all currencies if none specified)')
     .action((currency?: string) => handle(getPrivateClient().balance(currency)));
@@ -43,9 +48,19 @@ export function registerPrivateCommands(program: Command) {
     .action((id: string) => handle(getPrivateClient().cancel_order(parseInt(id, 10))));
 
   order
+    .command('cancel-all <market> <type>')
+    .description('Cancel all orders for a market and type (bid|ask)')
+    .action((market: string, type: string) => handle(getPrivateClient().cancel_orders(market, type)));
+
+  order
     .command('get <id>')
     .description('Get a single order by ID')
     .action((id: string) => handle(getPrivateClient().single_order(parseInt(id, 10))));
+
+  order
+    .command('batch <diff>')
+    .description('Create multiple orders in a batch (pass JSON array as string)')
+    .action((diff: string) => handle(getPrivateClient().batch_orders(JSON.parse(diff))));
 
   program
     .command('deposits <currency>')
@@ -73,6 +88,31 @@ export function registerPrivateCommands(program: Command) {
     .option('--simulate', 'Simulate withdrawal without executing')
     .action((currency: string, amount: string, address: string, opts: { simulate?: boolean }) => {
       handle(getPrivateClient().withdrawal(currency, parseFloat(amount), address, opts.simulate));
+    });
+
+  program
+    .command('lightning-withdraw <amount> <invoice>')
+    .description('Withdraw via Lightning Network')
+    .option('--simulate', 'Simulate withdrawal without executing')
+    .action((amount: string, invoice: string, opts: { simulate?: boolean }) => {
+      handle(getPrivateClient().lightning_withdrawal(parseFloat(amount), invoice, opts.simulate));
+    });
+
+  program
+    .command('lightning-invoice <amount> <currency>')
+    .description('Create a Lightning Network invoice')
+    .option('-m, --memo <memo>', 'Invoice memo')
+    .option('-e, --expiry <seconds>', 'Expiry in seconds')
+    .action((amount: string, currency: string, opts: { memo?: string; expiry?: string }) => {
+      handle(getPrivateClient().lightning_network_invoices(parseFloat(amount), currency, opts.memo, opts.expiry));
+    });
+
+  program
+    .command('fiat-deposit <currency> <amount>')
+    .description('Initiate a fiat deposit')
+    .option('--simulate', 'Simulate deposit without executing')
+    .action((currency: string, amount: string, opts: { simulate?: boolean }) => {
+      handle(getPrivateClient().new_fiat_deposit(currency, parseFloat(amount), opts.simulate));
     });
 
   const addr = program.command('address').description('Address management');

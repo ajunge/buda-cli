@@ -45,11 +45,17 @@ Credentials are saved to a `.env` file in your current directory.
 | `buda balance [currency]` | Get account balance (all currencies if omitted) |
 | `buda orders <market>` | List orders for a market |
 | `buda order new <market> <type> <price-type> <limit> <amount>` | Create a new order |
+| `buda me` | Get current user information |
 | `buda order cancel <id>` | Cancel an order |
+| `buda order cancel-all <market> <type>` | Cancel all orders for a market and type |
 | `buda order get <id>` | Get a single order |
+| `buda order batch <json>` | Create multiple orders in a batch |
 | `buda deposits <currency>` | List deposits for a currency |
 | `buda withdrawals <currency>` | List withdrawals for a currency |
 | `buda withdraw <currency> <amount> <address>` | Withdraw crypto to an address |
+| `buda lightning-withdraw <amount> <invoice>` | Withdraw via Lightning Network |
+| `buda lightning-invoice <amount> <currency>` | Create a Lightning Network invoice |
+| `buda fiat-deposit <currency> <amount>` | Initiate a fiat deposit |
 | `buda address new <currency>` | Create a new deposit address |
 
 ### Examples
@@ -71,6 +77,10 @@ npm install
 npm run dev -- <command>   # run without building
 npm run build              # compile TypeScript
 ```
+
+## Related
+
+- [buda-promise](https://www.npmjs.com/package/buda-promise) — the underlying Node.js API wrapper this CLI is built on
 
 ## License
 
