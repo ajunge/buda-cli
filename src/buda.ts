@@ -12,5 +12,5 @@ export function getPrivateClient() {
     console.error('Error: API credentials not configured. Run `buda init` to set them up.');
     process.exit(1);
   }
-  return new Buda(key, secret);
+  return new Buda(key, secret, { timeout: 30000 });
 }
