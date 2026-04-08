@@ -1,6 +1,6 @@
 {
   "name": "buda-cli",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "CLI for buda.com exchange using buda-promise",
   "main": "dist/index.js",
   "bin": {
