@@ -19,6 +19,16 @@ export function registerPublicCommands(program: Command) {
     .action(() => handle(getPublicClient().markets()));
 
   program
+    .command('market <market>')
+    .description('Get details for a specific market (e.g. btc-clp)')
+    .action((market: string) => handle(getPublicClient().market(market)));
+
+  program
+    .command('tickers')
+    .description('Get tickers for all markets')
+    .action(() => handle(getPublicClient().tickers()));
+
+  program
     .command('ticker <market>')
     .description('Get ticker for a market (e.g. btc-clp)')
     .action((market: string) => handle(getPublicClient().ticker(market)));

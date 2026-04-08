@@ -38,8 +38,9 @@ export function registerPrivateCommands(program: Command) {
   order
     .command('new <market> <type> <price-type> <limit> <amount>')
     .description('Create a new order (type: bid|ask, price-type: limit|market)')
-    .action((market: string, type: string, priceType: string, limit: string, amount: string) => {
-      handle(getPrivateClient().new_order(market, type, priceType, parseFloat(limit), parseFloat(amount)));
+    .option('--client-id <clientId>', 'Custom client ID for the order')
+    .action((market: string, type: string, priceType: string, limit: string, amount: string, opts: { clientId?: string }) => {
+      handle(getPrivateClient().new_order(market, type, priceType, parseFloat(limit), parseFloat(amount), opts.clientId));
     });
 
   order
@@ -61,6 +62,16 @@ export function registerPrivateCommands(program: Command) {
     .command('batch <diff>')
     .description('Create multiple orders in a batch (pass JSON array as string)')
     .action((diff: string) => handle(getPrivateClient().batch_orders(JSON.parse(diff))));
+
+  order
+    .command('get-by-client-id <client-id>')
+    .description('Get an order by client ID')
+    .action((clientId: string) => handle(getPrivateClient().order_by_client_id(clientId)));
+
+  order
+    .command('cancel-by-client-id <client-id>')
+    .description('Cancel an order by client ID')
+    .action((clientId: string) => handle(getPrivateClient().cancel_order_by_client_id(clientId)));
 
   program
     .command('deposits <currency>')
@@ -87,7 +98,15 @@ export function registerPrivateCommands(program: Command) {
     .description('Withdraw cryptocurrency to an address')
     .option('--simulate', 'Simulate withdrawal without executing')
     .action((currency: string, amount: string, address: string, opts: { simulate?: boolean }) => {
-      handle(getPrivateClient().withdrawal(currency, parseFloat(amount), address, opts.simulate));
+      handle(getPrivateClient().new_crypto_withdrawal(currency, parseFloat(amount), address, opts.simulate));
+    });
+
+  program
+    .command('fiat-withdraw <currency> <amount>')
+    .description('Withdraw fiat currency')
+    .option('--simulate', 'Simulate withdrawal without executing')
+    .action((currency: string, amount: string, opts: { simulate?: boolean }) => {
+      handle(getPrivateClient().new_fiat_withdrawal(currency, parseFloat(amount), opts.simulate));
     });
 
   program
@@ -121,4 +140,72 @@ export function registerPrivateCommands(program: Command) {
     .command('new <currency>')
     .description('Create a new deposit address for a currency')
     .action((currency: string) => handle(getPrivateClient().new_crypto_address(currency)));
+
+  addr
+    .command('get <currency> [address-id]')
+    .description('Get deposit address(es) for a currency')
+    .action((currency: string, addressId?: string) => handle(getPrivateClient().get_address(currency, addressId)));
+
+  // Cross-border payments (remittances)
+  const remittance = program.command('remittance').description('Cross-border payment management');
+
+  remittance
+    .command('quote')
+    .description('Quote a new remittance')
+    .requiredOption('--origin-currency <currency>', 'Origin currency')
+    .requiredOption('--destination-currency <currency>', 'Destination currency')
+    .option('--origin-amount <amount>', 'Origin amount')
+    .option('--destination-amount <amount>', 'Destination amount')
+    .option('--client-reference-id <id>', 'Client reference ID')
+    .option('--recipient-data <json>', 'Recipient data as JSON string')
+    .action((opts: {
+      originCurrency: string;
+      destinationCurrency: string;
+      originAmount?: string;
+      destinationAmount?: string;
+      clientReferenceId?: string;
+      recipientData?: string;
+    }) => {
+      handle(getPrivateClient().quote_remittance({
+        origin_currency: opts.originCurrency,
+        destination_currency: opts.destinationCurrency,
+        origin_amount: opts.originAmount ? parseFloat(opts.originAmount) : undefined,
+        destination_amount: opts.destinationAmount ? parseFloat(opts.destinationAmount) : undefined,
+        client_reference_id: opts.clientReferenceId,
+        recipient_data: opts.recipientData ? JSON.parse(opts.recipientData) : undefined,
+      }));
+    });
+
+  remittance
+    .command('accept <id>')
+    .description('Accept a quoted remittance')
+    .action((id: string) => handle(getPrivateClient().accept_remittance(id)));
+
+  remittance
+    .command('get <id>')
+    .description('Get remittance details')
+    .action((id: string) => handle(getPrivateClient().remittance(id)));
+
+  remittance
+    .command('list')
+    .description('List remittances')
+    .option('-p, --per <per>', 'Results per page')
+    .option('--page <page>', 'Page number')
+    .action((opts: { per?: string; page?: string }) => {
+      handle(getPrivateClient().remittances(opts.per, opts.page));
+    });
+
+  remittance
+    .command('recipients')
+    .description('List remittance recipients')
+    .option('-p, --per <per>', 'Results per page')
+    .option('--page <page>', 'Page number')
+    .action((opts: { per?: string; page?: string }) => {
+      handle(getPrivateClient().remittance_recipients(opts.per, opts.page));
+    });
+
+  remittance
+    .command('recipient <id>')
+    .description('Get remittance recipient details')
+    .action((id: string) => handle(getPrivateClient().remittance_recipient(id)));
 }
